@@ -24,8 +24,11 @@
     });
 
     client.on('message', (topic, payload) => {
-      let foodServe: string = payload.toString();
-      addFood(foodServe);
+      const response: string = payload.toString();
+      const parsedResponse = JSON.parse(response);
+      if (parsedResponse.table == tableNum) {
+        addFood(parsedResponse.food);
+      }
     });
 
     client.on('error', () => {
@@ -40,7 +43,11 @@
   });
 
   const sendOrder = () => {
-    client.publish('foodOrder', foodOrder);
+    const payload: string = JSON.stringify({
+      table: tableNum,
+      food: foodOrder
+    });
+    client.publish('foodOrder', payload);
   }
 
   let foods = $state<string[]>([]);
