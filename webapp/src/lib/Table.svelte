@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import mqtt from 'mqtt';
   import type { MqttClient } from 'mqtt';
+  import Popup from './Popup.svelte';
 
   let {
     tableNum = 0
@@ -21,6 +22,7 @@
     client.on('connect', () => {
       status = 'Connected';
       client.subscribe('foodServer');
+      console.log(`Table ${tableNum} connected.`);
     });
 
     client.on('message', (topic, payload) => {
@@ -28,21 +30,25 @@
       const parsedResponse = JSON.parse(response);
       if (parsedResponse.table == tableNum) {
         addFood(parsedResponse.food);
+        console.log(`Table ${tableNum} was served food.`);
       }
     });
 
     client.on('error', () => {
       status = 'Error';
+      console.log(`Table ${tableNum} experienced a connection error.`);
     });
   });
 
   onDestroy(() => {
     if (client) {
       client.end();
+      console.log(`Table ${tableNum} disconnected.`);
     }
   });
 
   const sendOrder = () => {
+    if (foodOrder === "") {return}
     const payload: string = JSON.stringify({
       table: tableNum,
       food: foodOrder
@@ -57,6 +63,10 @@
       foods = [...foods, newFood];
     }
   }
+
+  let isPopupOpen = $state(false);
+  const openOrderPopup = () => isPopupOpen = true;
+  const closeOrderPopup = () => isPopupOpen = false;
 </script>
 
 <main>
@@ -71,16 +81,22 @@
       {/each}
     </ul>
 
+    <button onclick={openOrderPopup}>
+      Order
+    </button>
+  </div>
+
+  <Popup show={isPopupOpen} close={closeOrderPopup}>
+    <h4>Ordering for table {tableNum}</h4>
     <input
-      id="single"
       type="text"
       bind:value={foodOrder}
-      placeholder="Make an order..."
+      placeholder="Enter item..."
     />
     <button onclick={sendOrder}>
       Order
     </button>
-  </div>
+  </Popup>
 </main>
 
 <style>
@@ -93,5 +109,7 @@
   .food-list {
     padding-left: 0;
     list-style-type: none;
+    height: 150px;
+    overflow-y: auto;
   }
 </style>
