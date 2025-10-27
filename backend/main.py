@@ -8,10 +8,10 @@ if sys.platform.startswith("win"):
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 # connection variables
-BROKER_HOST = "localhost"
+BROKER_HOST = "broker.emqx.io"
 BROKER_PORT = 1883
-FOOD_TOPIC = "foodOrder"
-SERVE_TOPIC = "foodServer"
+FOOD_TOPIC = "osensa/foodOrder"
+SERVE_TOPIC = "osensa/foodServer"
 
 # serve food callback
 async def serve_food(client, json_string, wait):

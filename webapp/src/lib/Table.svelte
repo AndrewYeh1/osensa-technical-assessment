@@ -16,12 +16,12 @@
   let status = $state('Connecting...');
 
   onMount(() => {
-    const url = 'ws://localhost:9001';
+    const url = 'ws://broker.emqx.io:8083/mqtt';
     client = mqtt.connect(url);
 
     client.on('connect', () => {
       status = 'Connected';
-      client.subscribe('foodServer');
+      client.subscribe('osensa/foodServer');
       console.log(`Table ${tableNum} connected.`);
     });
 
@@ -54,7 +54,7 @@
       table: tableNum,
       food: foodOrderTrimmed
     });
-    client.publish('foodOrder', payload);
+    client.publish('osensa/foodOrder', payload);
   }
 
   let foods = $state<string[]>([]);
