@@ -36,8 +36,13 @@ async def main():
     async with Client(BROKER_HOST, BROKER_PORT) as client:
         print("Connected to broker.")
         await client.subscribe(FOOD_TOPIC)
-        async for message in client.messages:
-            on_message(client, message)
+        try:
+            async for message in client.messages:
+                on_message(client, message)
+        except asyncio.CancelledError:
+            print("Shutting down server.")
+        finally:
+            print("Exited server.")
 
 if __name__ == "__main__":
     asyncio.run(main())
