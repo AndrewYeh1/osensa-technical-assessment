@@ -48,10 +48,11 @@
   });
 
   const sendOrder = () => {
-    if (foodOrder === "") {return}
+    const foodOrderTrimmed = foodOrder.trim();
+    if (foodOrderTrimmed === "") {return}
     const payload: string = JSON.stringify({
       table: tableNum,
-      food: foodOrder
+      food: foodOrderTrimmed
     });
     client.publish('foodOrder', payload);
   }
